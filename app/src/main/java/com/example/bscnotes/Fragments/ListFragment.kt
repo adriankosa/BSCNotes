@@ -26,11 +26,11 @@ class ListFragment : Fragment(), OnItemClickListener {
     private val notes: MutableList<Note> = mutableListOf()
 
     override fun onDeleteClicked(note: Note) {
-        note.id?.let { notesRef.document(it).delete().addOnSuccessListener { fillRecyclerView() } }
+        note.id?.let { notesRef.document(it).delete() }
     }
 
     override fun onNoteClicked(note: Note) {
-        // TODO Go to note fragment
+        goToNoteFragment(note)
     }
 
     override fun onCreateView(
@@ -45,6 +45,21 @@ class ListFragment : Fragment(), OnItemClickListener {
 
         addBtn.setOnClickListener {
             goToNoteFragment()
+        }
+
+        notesRef.orderBy("date", Query.Direction.DESCENDING).addSnapshotListener{data, error ->
+            notes.clear()
+            if (data != null) {
+                data.forEach {
+                    val note = Note(it.id, it.getString("noteText"), it.getDate("date"))
+                    notes.add(note)
+                }
+            }
+            recyclerView.apply {
+                layoutManager = LinearLayoutManager(activity)
+                adapter = NoteAdapter(notes, this@ListFragment)
+            }
+
         }
 
         return v
@@ -92,12 +107,18 @@ class ListFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun goToNoteFragment(){
+    private fun goToNoteFragment(note: Note? = null){
+
+        val noteFrament = NoteFragment()
+
+        if(note != null){
+            val bundle = Bundle()
+            bundle.putParcelable("note", note)
+            noteFrament.arguments = bundle
+        }
+
         val tx = fragmentManager!!.beginTransaction()
-        tx.replace(
-            R.id.containerFragment,
-            NoteFragment()
-        ).addToBackStack(null).commit()
+        tx.add(R.id.containerFragment, noteFrament).addToBackStack(null).commit()
     }
 
 }

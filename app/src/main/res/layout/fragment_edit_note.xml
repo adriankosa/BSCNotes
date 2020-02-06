@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:hint="@string/EnterNote"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="#6a8caf"
                 tools:visibility="invisible" />
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -50,21 +50,52 @@ class MainActivity : AppCompatActivity() {
 
             is NoteFragment -> {
 
+                val editField = activeFragment.view?.findViewById<TextInputEditText>(R.id.et_note)
+
                 if (userID.isEmpty()) {
                     userID = currentUser!!.uid
                 }
-                val editField = activeFragment.view?.findViewById<TextInputEditText>(R.id.et_note)
-                if (editField?.text?.isBlank() == false) {
-                    editField.text?.toString()?.let {
-                        usersCollection.document(userID).collection("notes").add(
-                            Note(null ,it, Date())
-                        ).addOnSuccessListener {
-                            super.onBackPressed()
-                        }.addOnFailureListener {
-                            Log.e(TAG, "Error writting new document: ", it)
+
+                if (NoteFragment.note == null){
+                    if (editField?.text?.isBlank() == false) {
+                        editField.text?.toString()?.let {
+                            usersCollection.document(userID).collection("notes").add(
+                                Note(null ,it, Date())
+                            ).addOnSuccessListener {
+                                super.onBackPressed()
+                            }.addOnFailureListener {
+                                Log.e(TAG, "Error writting new document: ", it)
+                            }
                         }
+                    } else super.onBackPressed()
+                }else{
+                    val noteId = NoteFragment.note!!.id
+
+                    if (editField?.text?.isBlank() == false) {
+                        editField.text?.toString()?.let {
+
+                            if (noteId != null) {
+                                usersCollection.document(userID).collection("notes").document(noteId).update("noteText", it)
+                                    .addOnSuccessListener {
+                                        NoteFragment.note = null
+                                        super.onBackPressed()
+                                    }.addOnFailureListener {
+                                        Log.e(TAG, "Error writting new document: ", it)
+                                    }
+                            }
+
+                        }
+                    }else{
+
+                        if (noteId != null) {
+                            usersCollection.document(userID).collection("notes").document(
+                                noteId
+                            ).delete().addOnSuccessListener { super.onBackPressed() }
+                        }
+
                     }
-                } else super.onBackPressed()
+                }
+
             }
 
             else -> super.onBackPressed()
