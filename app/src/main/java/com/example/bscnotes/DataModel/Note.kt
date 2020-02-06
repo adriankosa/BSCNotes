@@ -1,14 +1,14 @@
-package com.example.bscnotes
+package com.example.bscnotes.DataModel
 
 import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class Note(val noteText: String, val date: Date) {
+data class Note(val id: String?, val noteText: String? = null, val date: Date? = null) {
 
     @SuppressLint("SimpleDateFormat")
     fun getStringDate(): String{
         val format = SimpleDateFormat("dd/MM/yyy")
-        return format.format(date)
+        return format.format(date!!)
     }
 }
